@@ -109,7 +109,7 @@ func FetchAllSystemSnapshots(db *sql.DB) ([]*SystemSnapshotRow, error) {
 
 func DumpSnapshotData(db *sql.DB, snapshot Snapshot, blockNumber *big.Int) error {
 	//AddColumnWork
-	insertStatement := "INSERT INTO snapshot_data VALUES($1, $2, $3, $4, $5, $6, $7, $8)" //AddColumnWork
+	insertStatement := "INSERT INTO snapshot_data VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)" //AddColumnWork
 
 	for address := range snapshot {
 
@@ -122,7 +122,8 @@ func DumpSnapshotData(db *sql.DB, snapshot Snapshot, blockNumber *big.Int) error
 			snapshotRow.NonVotingLockedGoldBalance.String(),
 			snapshotRow.PendingWithdrawalGoldBalance.String(),
 			snapshotRow.CeloUSDValue.String(),
-			snapshotRow.Reward.String())
+			snapshotRow.Reward.String(),
+			snapshotRow.Commission.String())
 		//AddColumnWork //Order Matters
 		if err != nil {
 			return err
@@ -166,7 +167,7 @@ func FetchSnapshotData(db *sql.DB, blockNumber *big.Int) (Snapshot, error) {
 	var snapshot Snapshot
 	snapshot = make(map[string]SnapshotRow)
 	//AddColumnWork // Order Matters
-	fetchStatement := "SELECT address, gold_token_balance, locked_gold_balance, nonvoting_locked_gold_balance , pending_withdrawal_gold_balance, celo_usd_value, reward  from snapshot_data where block_number = $1"
+	fetchStatement := "SELECT address, gold_token_balance, locked_gold_balance, nonvoting_locked_gold_balance , pending_withdrawal_gold_balance, celo_usd_value, reward, commission_celo_usd from snapshot_data where block_number = $1"
 
 	rows, err := db.Query(fetchStatement, blockNumber.String())
 	if err != nil {
@@ -182,7 +183,8 @@ func FetchSnapshotData(db *sql.DB, blockNumber *big.Int) (Snapshot, error) {
 			&spr.NonVotingLockedGoldBalance,
 			&spr.PendingWithdrawalGoldBalance,
 			&spr.CeloUSDValue,
-			&spr.Reward)
+			&spr.Reward,
+			&spr.Commission)
 		//AddColumnWork
 		//Order Matters
 		if err != nil {
@@ -274,6 +276,30 @@ func DumpRewardsSnapshotData(db *sql.DB, rs RewardsSnapshot, blockNumber *big.In
 
 }
 
+func DumpCommissionsSnapshotData(db *sql.DB, cs CommissionsSnapshot, blockNumber *big.Int) error {
+	//AddColumnWork
+	insertStatement := "INSERT INTO commissions_snapshot_data VALUES($1, $2, $3, $4, $5, $6)" //AddColumnWork
+
+	for _, row := range cs {
+
+		_, err := db.Exec(insertStatement,
+			blockNumber.String(),
+			row.EpochBlockNumber.String(),
+			row.Validator,
+			row.ValidatorPayment.String(),
+			row.Group,
+			row.GroupPayment.String())
+
+		if err != nil {
+			return err
+		}
+
+	}
+
+	return nil
+
+}
+
 func FetchAccountVotesSnapshot(db *sql.DB, account string) (AccountVotesSnapshot, error) {
 
 	fetchStatement := `SELECT block_number, for_group, active_votes, pending_votes, total_votes
@@ -327,7 +353,7 @@ func FetchAccountSnapshot(db *sql.DB, account string) (AccountSnapshot, error) {
 	//Order Matters
 	fetchStatement := `SELECT block_number, gold_token_balance, locked_gold_balance, 
 						nonvoting_locked_gold_balance , pending_withdrawal_gold_balance, 
-						celo_usd_value, reward  
+						celo_usd_value, reward, commission_celo_usd
 						FROM snapshot_data 
 						WHERE address ILIKE $1`
 
@@ -347,7 +373,8 @@ func FetchAccountSnapshot(db *sql.DB, account string) (AccountSnapshot, error) {
 			&asr.NonVotingLockedGoldBalance,
 			&asr.PendingWithdrawalGoldBalance,
 			&asr.CeloUSDValue,
-			&asr.Reward)
+			&asr.Reward,
+			&asr.Commission)
 		//AddColumnWork
 		//Order Matters
 		if err != nil {

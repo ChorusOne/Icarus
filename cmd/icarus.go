@@ -39,11 +39,11 @@ func main() {
 
 	blockshot.BlockIterator(db,
 		[]blockshot.Task{
-			blockshot.ProcessTransactions,
+			//blockshot.ProcessTransactions,
 			//Note : GenerateTransactionTags depends on ProcessTransactions
 			//So the following task should only appear after ProcessTransactions task
 			//in this list
-			blockshot.GenerateTransactionTags,
+			//blockshot.GenerateTransactionTags,
 			blockshot.TakeDailySnapshots,
 		})
 

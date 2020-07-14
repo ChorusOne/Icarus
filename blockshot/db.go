@@ -25,6 +25,7 @@ func ResetDatabase(db *sql.DB) {
 	DeleteTable("system_snapshot_data", db)
 	DeleteTable("votes_snapshot_data", db)
 	DeleteTable("rewards_snapshot_data", db)
+	DeleteTable("commissions_snapshot_data", db)
 
 	CreateStatusTable(db)
 	CreateTransactionsTable(db)
@@ -36,6 +37,7 @@ func ResetDatabase(db *sql.DB) {
 	CreateSystemSnapshotDataTable(db)
 	CreateVotesSnapshotDataTable(db)
 	CreateRewardsSnapshotDataTable(db)
+	CreateCommissionsSnapshotDataTable(db)
 
 }
 
@@ -137,6 +139,7 @@ func CreateSnapshotDataTable(db *sql.DB) {
 		pending_withdrawal_gold_balance text NOT NULL,
 		celo_usd_value text NOT NULL,
 		reward text NOT NULL,
+		commission_celo_usd text NOT NULL,
 		PRIMARY KEY (block_number, address)
 
 
@@ -195,6 +198,24 @@ func CreateRewardsSnapshotDataTable(db *sql.DB) {
 		address_reward text NOT NULL, 
 		group_reward text NOT NULL, 
 		PRIMARY KEY (block_number, epoch_block_number, address, for_group)
+		);
+	`
+
+	DBExec(statement, db)
+
+}
+
+func CreateCommissionsSnapshotDataTable(db *sql.DB) {
+
+	statement := `
+	CREATE TABLE commissions_snapshot_data(
+		block_number integer NOT NULL,
+		epoch_block_number integer NOT NULL,
+		validator text NOT NULL, 
+		validator_cusd_payment text NOT NULL, 
+		val_group text NOT NULL, 
+		val_group_cusd_payment text NOT NULL,
+		PRIMARY KEY (block_number, epoch_block_number, validator, val_group)
 		);
 	`
 
