@@ -64,6 +64,7 @@ func AccountWithHistoricalDetails(accountID string, Db *sql.DB) ([]*types.DatedA
 			datedAccount.PendingWithdrawalBalance = asr.PendingWithdrawalGoldBalance
 			datedAccount.CeloUSDValue = asr.CeloUSDValue
 			datedAccount.SnapshotReward = asr.Reward
+			datedAccount.SnapshotCommission = asr.Commission
 
 		}
 

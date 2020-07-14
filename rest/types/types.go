@@ -62,10 +62,11 @@ func NewAccount(address string) *Account {
 
 //DatedAccount represents an account and its details extracted from a daily snapshot
 type DatedAccount struct {
-	SnapshotDate   Date    `json:"snapshotDate"`
-	Address        Address `json:"address"`
-	Height         Height  `json:"height"`
-	SnapshotReward Amount  `json:"snapshotReward"`
+	SnapshotDate       Date    `json:"snapshotDate"`
+	Address            Address `json:"address"`
+	Height             Height  `json:"height"`
+	SnapshotReward     Amount  `json:"snapshotReward"`
+	SnapshotCommission Amount  `json:"snapshotCommission"`
 
 	GoldTokenBalance           Amount `json:"availableGoldBalance"`
 	TotalLockedGoldBalance     Amount `json:"totalLockedGoldBalance"`
@@ -81,10 +82,11 @@ type DatedAccount struct {
 func NewDatedAccount(date string, address string) *DatedAccount {
 
 	return &DatedAccount{
-		SnapshotDate:   date,
-		Address:        address,
-		Height:         "0",
-		SnapshotReward: "0",
+		SnapshotDate:       date,
+		Address:            address,
+		Height:             "0",
+		SnapshotReward:     "0",
+		SnapshotCommission: "0",
 
 		GoldTokenBalance:           "0",
 		TotalLockedGoldBalance:     "0",
