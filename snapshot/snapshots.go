@@ -39,9 +39,10 @@ func GenerateAndStoreBlockSnapshots(db *sql.DB, blockNumber *big.Int, rpcClient 
 	tStart := time.Now()
 	previousSnapshotBlockNumber := fetchPreviousSnapshotBlockNumber(db)
 
-	// We will take RewardsSnapshot first as we need to pass the first output to SnapshotAccountLevel
 	accountRewards, rewardsSnapshot := SnapshotRewardsAccountLevel(blockNumber, previousSnapshotBlockNumber)
-	var snapshot Snapshot = SnapshotAccountLevel(db, rpcClient, blockNumber, previousSnapshotBlockNumber, accountRewards)
+	accountCommissions, commissionsSnapshot := SnapshotCommissionsAccountLevel(blockNumber, previousSnapshotBlockNumber)
+	var snapshot Snapshot = SnapshotAccountLevel(db, rpcClient, blockNumber, previousSnapshotBlockNumber, accountRewards, accountCommissions)
+
 	var systemSnapshot SystemSnapshot = SnapshotSystemLevel(rpcClient, blockNumber)
 	var votesSnapshot VotesSnapshot = VotesSnapshotAccountLevel(blockNumber)
 
@@ -57,6 +58,12 @@ func GenerateAndStoreBlockSnapshots(db *sql.DB, blockNumber *big.Int, rpcClient 
 	log.Println("SnapshotAccount Level Time : ", tEnd.Sub(tStart))
 
 	err = DumpRewardsSnapshotData(db, rewardsSnapshot, blockNumber)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = DumpCommissionsSnapshotData(db, commissionsSnapshot, blockNumber)
 
 	if err != nil {
 		log.Fatal(err)
@@ -114,7 +121,8 @@ func SnapshotAccountLevel(
 	rpcClient *rpc.Client,
 	blockNumber *big.Int,
 	previousSnapshotBlockNumber *big.Int,
-	accountRewards AccountRewards) Snapshot {
+	accountRewards AccountRewards,
+	accountCommissions AccountCommissions) Snapshot {
 
 	var snapshot = make(Snapshot)
 
@@ -152,6 +160,19 @@ func SnapshotAccountLevel(
 
 		row := snapshot[address]
 		row.Reward = accountRewards[address]
+		snapshot[address] = row
+	}
+
+	// Add Commissions To Table
+
+	for address := range accountCommissions {
+		if _, ok := snapshot[address]; !ok {
+			log.Print("Warning : This is not expected! If an address has a commission, it is expected to be in the snapshot already!")
+			snapshot[address] = NewSnapshotRow()
+		}
+
+		row := snapshot[address]
+		row.Commission = accountCommissions[address]
 		snapshot[address] = row
 	}
 
@@ -309,4 +330,55 @@ func SnapshotRewardsAccountLevel(blockNumber *big.Int, previousSnapshotBlockNumb
 		}
 	}
 	return accountRewards, rewardsSnapshot
+}
+
+func SnapshotCommissionsAccountLevel(blockNumber *big.Int, previousSnapshotBlockNumber *big.Int) (AccountCommissions, CommissionsSnapshot) {
+
+	//Get EpochPaymentsInfo between previousSnapshotBlockNumber+1 and this block (Both included)
+	var fromBlock *big.Int = big.NewInt(0)
+	fromBlock.Add(previousSnapshotBlockNumber, big.NewInt(1))
+	commissions := atlas.GetEpochPaymentEvents(fromBlock, blockNumber)
+
+	var accountCommissions AccountCommissions
+	accountCommissions = make(map[Address]*big.Int)
+
+	var commissionsSnapshot CommissionsSnapshot
+	commissionsSnapshot = make([]*CommissionsSnapshotRow, 0)
+
+	for _, commission := range commissions {
+
+		validator := commission.Validator.String()
+		group := commission.Group.String()
+
+		// Prepare CommissionsSnapshotRow
+
+		csr := &CommissionsSnapshotRow{
+			EpochBlockNumber: commission.BlockNumber,
+			Validator:        validator,
+			ValidatorPayment: commission.ValidatorPayment,
+			Group:            group,
+			GroupPayment:     commission.GroupPayment,
+		}
+
+		commissionsSnapshot = append(commissionsSnapshot, csr)
+
+		//Add validator commission to consolidated accountCommissionsMap
+
+		if _, ok := accountCommissions[validator]; !ok {
+			accountCommissions[validator] = big.NewInt(0)
+		}
+
+		accountCommissions[validator].Add(commission.ValidatorPayment, accountCommissions[validator])
+
+		//Add group commission to consolidated accountCommissionsMap
+
+		if _, ok := accountCommissions[group]; !ok {
+			accountCommissions[group] = big.NewInt(0)
+		}
+
+		accountCommissions[group].Add(commission.GroupPayment, accountCommissions[group])
+
+	}
+
+	return accountCommissions, commissionsSnapshot
 }

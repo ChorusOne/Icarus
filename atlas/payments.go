@@ -16,7 +16,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
-// Atlas Functions relevant to validator and validator group epoch payments / commissions
+// Atlas Functions relevant to validator and group epoch payments (aka commissions, in cUSD)
 
 //EpochPaymentEvent is a struct to represent data for the event
 //ValidatorEpochPaymentDistributed(address,unit256,address,uint256)
