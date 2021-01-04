@@ -86,7 +86,7 @@ func IndexResponder() types.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := db.Ping(); err != nil {
 			w.Write([]byte("{\"status\":\"bad\", \"error\":\"db connection failed\"}"))
-        	}
+		}
 		w.Write([]byte("{\"status\":\"ok\"}"))
 
 	}

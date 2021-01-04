@@ -21,7 +21,7 @@ func HistoricalProposalsData(rc *rpc.Client) types.Handler {
 
 		if err != nil {
 			log.Print(err)
-	
+
 		} else {
 
 			heightQuery := r.URL.Query().Get("block_height")
@@ -42,7 +42,7 @@ func HistoricalProposalsData(rc *rpc.Client) types.Handler {
 			w.Header().Set("Content-Type", "application/json")
 			if err := json.NewEncoder(w).Encode(proposalsHistory); err != nil {
 				log.Println(err)
-		
+
 			}
 		}
 	}
@@ -51,7 +51,6 @@ func HistoricalProposalsData(rc *rpc.Client) types.Handler {
 func AllProposalsUptoBlockNumber(blockNumber *big.Int) *contract.AssortedProposals {
 
 	allProposals, err := contract.GetAllProposalsUptoBlockNumber(blockNumber)
-
 
 	if err != nil {
 		log.Print("Error while fetching all proposals upto block number :", blockNumber)

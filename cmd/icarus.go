@@ -14,9 +14,9 @@ func main() {
 	log.Print("Icarus - Time to Fly.")
 
 	err := godotenv.Load("./config.env")
-        if err != nil {
-                log.Print("./config.env not found; continuing in the case you are using ENV vars.")
-        }
+	if err != nil {
+		log.Print("./config.env not found; continuing in the case you are using ENV vars.")
+	}
 
 	db, err := NewPostgresDBFromEnvironment()
 
@@ -26,7 +26,7 @@ func main() {
 
 	defer db.Close()
 
-        if Getenv("RESET_DB", "false") == "true" {
+	if Getenv("RESET_DB", "false") == "true" {
 		blockshot.ResetDatabase(db)
 	}
 

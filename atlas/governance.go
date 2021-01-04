@@ -156,7 +156,6 @@ func GetExecutionStatusOfProposal(proposal *ProposalQueuedEvent, uptoBlockNumber
 
 	logs, err := atlasEthClient.FilterLogs(context.Background(), query)
 
-
 	if err != nil {
 		log.Printf("Error retrieving ProposalExecuted Logs for Proposal ID #%s at Block Number %s \n", proposal.ProposalId.Big(), uptoBlockNumber)
 		log.Printf("Hence reporting executed status for this proposal as false")

@@ -8,10 +8,10 @@ import (
 
 func main() {
 
-        err := godotenv.Load("./config.env")
-        if err != nil {
-                log.Print("./config.env not found; continuing in the case you are using ENV vars.")
-        }
+	err := godotenv.Load("./config.env")
+	if err != nil {
+		log.Print("./config.env not found; continuing in the case you are using ENV vars.")
+	}
 
 	rest.StartAPI()
 

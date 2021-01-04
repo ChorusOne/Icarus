@@ -8,7 +8,6 @@ import (
 	_ "github.com/lib/pq"
 	"log"
 	"os"
-
 )
 
 // NewRPCClient returns a new rpcclient pointer for the Celo blockchain
@@ -47,7 +46,7 @@ func NewPostgresDBFromEnvironment() (*sql.DB, error) {
 	dbname := os.Getenv("DB_NAME")
 	sslMode := Getenv("DB_SSLMODE", "require")
 
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s " +
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=%s sslmode=%s",
 		host, port, user, password, dbname, sslMode)
 
