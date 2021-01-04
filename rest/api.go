@@ -84,8 +84,11 @@ func StartAPI() {
 // IndexResponder acts as a health check.
 func IndexResponder() types.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// TODO: Make health check connect to DB and SELECT 1; to ensure we have a live db connection.
-		w.Write([]byte("Repeat after me: I am not a tyrant, I am not a tyrant, I am not a tyrant..."))
+		if err := db.Ping(); err != nil {
+			w.Write([]byte("{\"status\":\"bad\", \"error\":\"db connection failed\"}"))
+        	}
+		w.Write([]byte("{\"status\":\"ok\"}"))
+
 	}
 }
 
