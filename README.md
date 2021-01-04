@@ -6,28 +6,39 @@ Icarus is a data extractor for the Celo network. It currently powers the backend
 
 ## Requirements
 
-- Go >= 1.13.9
+- Go >= 1.15.0
 - Postgres >= 10
 
 ## Setup Instructions
 
-_Better instructions coming soon_
+To build, run `make build`. 
+
+## Configuration
+
+Config variables that can / should be set for running Icarus are as follows:
+
+- `CELO_URI`: URI (either unix://.. or http(s):// accepted) to Celo blockchain node. A local node connected via IPC will sync much faster.
+- `DB_HOST`
+- `DB_USER`
+- `DB_PASSWORD`
+- `DB_NAME`
+- `DB_PORT`
+- `DB_SSLMODE`: Defaults to `require`.
+- `LISTEN_ADDRESS`: Defaults to `0.0.0.0:10101`.
 
 
 ## Runnning Icarus 
 
-1. Create `config.env` file in the `cmd/` folder (Refer sample at `cmd/config.env.sample`)
+1. Create `config.env` in your working directory. Refer sample at `config.env.sample`, or set the environment variables referenced above.
 
 2. Run the Extractor 
     ```
-    cd cmd
-    go run icarus.go
+    ./build/icarus
     ```
 
 3. Run the API server
     ```
-    cd cmd
-    go run api.go
+    ./build/icarus-api
     ```
 
 ## Contributing / Code Layout
