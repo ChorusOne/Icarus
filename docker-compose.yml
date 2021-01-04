@@ -1,0 +1,6 @@
+version: '3.8'
+services:
+  icarus:
+    image: chorusone/icarus:latest
+    build:
+      context: .
