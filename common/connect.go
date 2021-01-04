@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"log"
 	"os"
+
 )
 
 // NewRPCClient returns a new rpcclient pointer for the Celo blockchain
@@ -53,22 +53,18 @@ func NewEthClient() (*ethclient.Client, error) {
 
 }
 
-func NewPostgresDBFromConfig(config_file string) (*sql.DB, error) {
-
-	err := godotenv.Load(config_file)
-	if err != nil {
-		return nil, err
-	}
+func NewPostgresDBFromEnvironment() (*sql.DB, error) {
 
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 	user := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
 	dbname := os.Getenv("DB_NAME")
+	sslMode := Getenv("DB_SSLMODE", "require")
 
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+		"password=%s dbname=%s sslmode=%s",
+		host, port, user, password, dbname, sslMode)
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
