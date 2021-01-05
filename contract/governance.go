@@ -501,7 +501,6 @@ func GetAllProposalsUptoBlockNumber(atBlockNumber *big.Int) (*AssortedProposals,
 
 			yesVotes, noVotes, abstainVotes, err1 := governanceContractInstance.GetVoteTotals(&bind.CallOpts{BlockNumber: atBlockNumber}, proposalID)
 
-
 			if err1 != nil {
 				log.Printf("Was not able to retrive votes of Execution Proposal #ID %s, so skipping this proposal \n", proposalID)
 				log.Println(err1)
@@ -509,7 +508,6 @@ func GetAllProposalsUptoBlockNumber(atBlockNumber *big.Int) (*AssortedProposals,
 			}
 
 			proposer, _, propEpoch, _, description, err2 := governanceContractInstance.GetProposal(&bind.CallOpts{BlockNumber: atBlockNumber}, proposalID)
-
 
 			if err2 != nil {
 				log.Printf("Was not able to retrive proposer, description and timestamp of Execution Proposal #ID %s, so skipping this proposal \n", proposalID)

@@ -171,7 +171,6 @@ type TransactionDetailed struct {
 	Tags        Tags        `json:"tags"`
 }
 
-
 //Types For Different Event Logs - StableToken.sol and GoldToken.sol
 
 //LogTransfer - to capture details from an event log of form Transfer
@@ -227,7 +226,6 @@ type LogAccountSlashed struct {
 	Reporter common.Address
 	Reward   *big.Int
 }
-
 
 //Types For Different Event Logs - Governance.sol
 

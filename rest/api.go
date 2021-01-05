@@ -38,9 +38,9 @@ func initClients() {
 
 }
 
-func initDb(configFile string) {
+func initDb() {
 	var err error
-	db, err = NewPostgresDBFromConfig(configFile)
+	db, err = NewPostgresDBFromEnvironment()
 
 	if err != nil {
 		log.Fatal(err)
@@ -49,15 +49,16 @@ func initDb(configFile string) {
 
 // StartAPI creates an HTTP server with a REST API for Anthem to consume. This
 // function blocks and so should be spawned as a goroutine.
-func StartAPI(configFile string) {
+func StartAPI() {
 
-	initDb(configFile)
+	initDb()
 
 	initClients()
 	contract.InitClientAndContracts()
 
 	r := chi.NewRouter()
 	r.Get("/", IndexResponder())
+	r.Get("/status", IndexResponder())
 
 	r.Route("/accounts/{accountID}", func(r chi.Router) {
 
@@ -77,13 +78,18 @@ func StartAPI(configFile string) {
 		r.Get("/transactions/{txHash}", system.TransactionData(db))
 	})
 
-	http.ListenAndServe(":10101", r) // Todo : Config-ify
+	http.ListenAndServe(Getenv("BIND_ADDRESS", ":10101"), r)
 }
 
 // IndexResponder acts as a health check.
 func IndexResponder() types.Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Repeat after me: I am not a tyrant, I am not a tyrant, I am not a tyrant..."))
+		if err := db.Ping(); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("{\"status\":\"bad\", \"error\":\"db connection failed\"}"))
+		}
+		w.Write([]byte("{\"status\":\"ok\"}"))
+
 	}
 }
 

@@ -39,13 +39,13 @@ type EpochRewardEvent struct {
 // and hence are potential recipients of a share of these rewards.
 // This will return a superset of the list of addresses that are actual recipients of the reward shares.
 // (depending on whether their vote for the group was active in this epoch cycle )
-// Relevant event 
-	/* event ValidatorGroupVoteActivated(
-	   address indexed account,
-	   address indexed group,
-	   uint256 value,
-	   uint256 units
-	*/
+// Relevant event
+/* event ValidatorGroupVoteActivated(
+   address indexed account,
+   address indexed group,
+   uint256 value,
+   uint256 units
+*/
 func AddAtlasToRewardInfo(ri *RewardInfo) {
 
 	var logVGVA = []byte("ValidatorGroupVoteActivated(address,address,uint256,uint256)")
